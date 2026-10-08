@@ -1,4 +1,33 @@
-This branch adds support for using the M7200's indicator LEDs. On tested hardware, the Wi-Fi LED is exposed as signal2_led and the Internet LED as signal3_led. The M7200 LED implementation uses the Wi-Fi LED for normal recording/paused status and the Internet LED as a warning indicator when Rayhunter detects a warning.
+# TP-Link M7200
+
+This fork adds support for using the TP-Link M7200's indicator LEDs as Rayhunter's hardware status display.
+
+The M7200 is intended to be used as a standalone Rayhunter device. It does not need to provide normal Wi-Fi or Internet access for Rayhunter to operate. Instead, the device runs Rayhunter locally and uses its existing indicator LEDs to provide status information.
+
+This is particularly useful because the M7200 has no display suitable for Rayhunter's normal UI. The LEDs provide a simple way to monitor Rayhunter without relying on a connected computer, web interface, Wi-Fi client, or Internet connection.
+
+
+LED status
+The M7200 exposes two indicator LEDs to Linux:
+
+signal2_led &rarr;  Wi-Fi indicator
+
+signal3_led &rarr;  Internet indicator
+
+Rayhunter uses these indicators as follows:
+
+Recording	&rarr; Wi-Fi LED blinks
+
+Paused	&rarr; Wi-Fi LED blinks
+
+Warning detected	&rarr; Internet LED blinks
+
+Stopped	Both &rarr; LEDs are off
+
+
+When Rayhunter is running in this mode, these LEDs represent Rayhunter status rather than the M7200's normal network status.
+
+The M7200's normal kernel LED triggers are disabled before Rayhunter takes control of the LEDs. This prevents the modem's normal LED handling from interfering with Rayhunter's status indication.
 
 # Rayhunter
 ![Tests](https://github.com/EFForg/rayhunter/actions/workflows/main.yml/badge.svg)
