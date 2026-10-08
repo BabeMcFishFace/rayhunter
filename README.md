@@ -1,6 +1,6 @@
 # TP-Link M7200
 
-This fork adds support for using the TP-Link M7200's indicator LEDs as Rayhunter's hardware status display.
+This branch adds support for using the TP-Link M7200's indicator LEDs as a hardware status display for Rayhunter.
 
 The M7200 is intended to be used as a standalone Rayhunter device. It does not need to provide normal Wi-Fi or Internet access for Rayhunter to operate. Instead, the device runs Rayhunter locally and uses its existing indicator LEDs to provide status information.
 
