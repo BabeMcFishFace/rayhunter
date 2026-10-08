@@ -6,28 +6,42 @@ The M7200 is intended to be used as a standalone Rayhunter device. It does not n
 
 This is particularly useful because the M7200 has no display suitable for Rayhunter's normal UI. The LEDs provide a simple way to monitor Rayhunter without relying on a connected computer, web interface, Wi-Fi client, or Internet connection.
 
+**LED status**
 
-LED status
-The M7200 exposes two indicator LEDs to Linux:
+The M7200 exposes two useful LEDs to Linux:
 
-signal2_led &rarr;  Wi-Fi indicator
+- signal2_led &rarr;  Wi-Fi indicator
+- signal3_led &rarr;  Internet indicator
 
-signal3_led &rarr;  Internet indicator
+They can be used as follows:
 
-Rayhunter uses these indicators as follows:
-
-Recording	&rarr; Wi-Fi LED blinks
-
-Paused	&rarr; Wi-Fi LED blinks
-
-Warning detected	&rarr; Internet LED blinks
-
-Stopped	Both &rarr; LEDs are off
-
+- Recording	&rarr; Wi-Fi LED blinks
+- Paused	&rarr; Wi-Fi LED blinks
+- Warning detected	&rarr; Internet LED blinks
+- Stopped	Both &rarr; LEDs are off
 
 When Rayhunter is running in this mode, these LEDs represent Rayhunter status rather than the M7200's normal network status.
 
 The M7200's normal kernel LED triggers are disabled before Rayhunter takes control of the LEDs. This prevents the modem's normal LED handling from interfering with Rayhunter's status indication.
+
+**Implementation**
+
+The M7200 LED support is implemented in:
+
+daemon/src/display/tplink.rs
+
+The implementation:
+
+- detects the M7200 through its signal2_led and signal3_led LED interfaces;
+- takes control of those LEDs;
+- disables the M7200's normal kernel LED trigger;
+- maps Rayhunter's Recording, Paused, and WarningDetected states to the physical LEDs;
+- turns the LEDs off when Rayhunter shuts down;
+- leaves the existing TP-Link OLED/framebuffer handling unchanged for other TP-Link devices.
+
+The M7200-specific hardware and installation information is documented in:
+
+doc/tplink-m7200.md
 
 # Rayhunter
 ![Tests](https://github.com/EFForg/rayhunter/actions/workflows/main.yml/badge.svg)
