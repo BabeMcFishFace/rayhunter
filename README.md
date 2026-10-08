@@ -1,47 +1,49 @@
-# TP-Link M7200
+## TP-Link M7200
 
-This branch adds support for using the TP-Link M7200's indicator LEDs as a hardware status display for Rayhunter.
+This branch adds support for using the **M7200's indicator LEDs as a hardware status display for Rayhunter**.
 
-The M7200 is intended to be used as a standalone Rayhunter device. It does not need to provide normal Wi-Fi or Internet access for Rayhunter to operate. Instead, the device runs Rayhunter locally and uses its existing indicator LEDs to provide status information.
+The M7200 is intended to be used as a **standalone Rayhunter device**. It does not need to provide normal Wi-Fi or Internet access for Rayhunter to operate. Instead, the device runs Rayhunter locally and uses its existing indicator LEDs to provide status information.
 
 This is particularly useful because the M7200 has no display suitable for Rayhunter's normal UI. The LEDs provide a simple way to monitor Rayhunter without relying on a connected computer, web interface, Wi-Fi client, or Internet connection.
 
-**LED status**
+### LED status
 
 The M7200 exposes two useful LEDs to Linux:
 
-- signal2_led &rarr;  Wi-Fi indicator
-- signal3_led &rarr;  Internet indicator
+- `signal2_led` — Wi-Fi indicator
+- `signal3_led` — Internet indicator
 
-They can be used as follows:
+They are used as follows:
 
-- Recording	&rarr; Wi-Fi LED blinks
-- Paused	&rarr; Wi-Fi LED blinks
-- Warning detected	&rarr; Internet LED blinks
-- Stopped	Both &rarr; LEDs are off
+| Rayhunter status | M7200 indicator |
+|---|---|
+| Recording | Wi-Fi LED blinks |
+| Paused | Wi-Fi LED blinks |
+| Warning detected | Internet LED blinks |
+| Stopped | Both LEDs are off |
 
-When Rayhunter is running in this mode, these LEDs represent Rayhunter status rather than the M7200's normal network status.
+When Rayhunter is running in this mode, these LEDs represent **Rayhunter status rather than the M7200's normal network status**.
 
 The M7200's normal kernel LED triggers are disabled before Rayhunter takes control of the LEDs. This prevents the modem's normal LED handling from interfering with Rayhunter's status indication.
 
-**Implementation**
+### Implementation
 
 The M7200 LED support is implemented in:
 
-daemon/src/display/tplink.rs
+`daemon/src/display/tplink.rs`
 
 The implementation:
 
-- detects the M7200 through its signal2_led and signal3_led LED interfaces;
+- detects the M7200 through its `signal2_led` and `signal3_led` LED interfaces;
 - takes control of those LEDs;
-- disables the M7200's normal kernel LED trigger;
-- maps Rayhunter's Recording, Paused, and WarningDetected states to the physical LEDs;
+- disables the M7200's normal kernel LED triggers;
+- maps Rayhunter's `Recording`, `Paused`, and `WarningDetected` states to the physical LEDs;
 - turns the LEDs off when Rayhunter shuts down;
 - leaves the existing TP-Link OLED/framebuffer handling unchanged for other TP-Link devices.
 
 The M7200-specific hardware and installation information is documented in:
 
-doc/tplink-m7200.md
+`doc/tplink-m7200.md`
 
 # Rayhunter
 ![Tests](https://github.com/EFForg/rayhunter/actions/workflows/main.yml/badge.svg)
