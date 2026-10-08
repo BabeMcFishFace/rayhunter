@@ -1,3 +1,5 @@
+This branch adds support for using the M7200's indicator LEDs. On tested hardware, the Wi-Fi LED is exposed as signal2_led and the Internet LED as signal3_led. The M7200 LED implementation uses the Wi-Fi LED for normal recording/paused status and the Internet LED as a warning indicator when Rayhunter detects a warning.
+
 # Rayhunter
 ![Tests](https://github.com/EFForg/rayhunter/actions/workflows/main.yml/badge.svg)
 
