@@ -13,8 +13,7 @@ const WIFI_LED: &str = "/sys/class/leds/signal2_led";
 const INTERNET_LED: &str = "/sys/class/leds/signal3_led";
 
 fn is_m7200_led_device() -> bool {
-    fs::exists(WIFI_LED).unwrap_or(false)
-        && fs::exists(INTERNET_LED).unwrap_or(false)
+    fs::exists(WIFI_LED).unwrap_or(false) && fs::exists(INTERNET_LED).unwrap_or(false)
 }
 
 async fn set_led(path: &str, brightness: u8) {
@@ -28,9 +27,7 @@ async fn set_led(path: &str, brightness: u8) {
         return;
     }
 
-    if let Err(e) =
-        tokio::fs::write(&brightness_path, brightness.to_string()).await
-    {
+    if let Err(e) = tokio::fs::write(&brightness_path, brightness.to_string()).await {
         error!("failed to set LED brightness for {path}: {e}");
     }
 }
@@ -139,11 +136,7 @@ pub fn update_ui(
     if is_m7200_led_device() {
         info!("detected TP-Link M7200 LED display");
 
-        update_m7200_led_ui(
-            task_tracker,
-            shutdown_token,
-            ui_update_rx,
-        );
+        update_m7200_led_ui(task_tracker, shutdown_token, ui_update_rx);
 
         return;
     }
@@ -159,20 +152,10 @@ pub fn update_ui(
     if fs::exists(tplink_onebit::OLED_PATH).unwrap_or_default() {
         info!("detected one-bit display");
 
-        tplink_onebit::update_ui(
-            task_tracker,
-            config,
-            shutdown_token,
-            ui_update_rx,
-        );
+        tplink_onebit::update_ui(task_tracker, config, shutdown_token, ui_update_rx);
     } else {
         info!("fallback to framebuffer");
 
-        tplink_framebuffer::update_ui(
-            task_tracker,
-            config,
-            shutdown_token,
-            ui_update_rx,
-        );
+        tplink_framebuffer::update_ui(task_tracker, config, shutdown_token, ui_update_rx);
     }
 }
