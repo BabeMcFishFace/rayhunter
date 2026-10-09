@@ -20,8 +20,8 @@ async fn set_led(path: &str, brightness: u8) {
     let trigger = format!("{path}/trigger");
     let brightness_path = format!("{path}/brightness");
 
-    // Do not use the kernel "timer" trigger.
-    // The M7200's timer trigger can leave the LED at brightness 0.
+    // Disable the kernel trigger so it does not interfere with
+    // manual LED brightness control.
     if let Err(e) = tokio::fs::write(&trigger, "none").await {
         error!("failed to disable LED trigger for {path}: {e}");
         return;
@@ -55,14 +55,13 @@ fn update_m7200_led_ui(
                 break;
             }
 
-            // Check for a new UI state without blocking the blink loop.
+            // Check for state updates without blocking the blink loop.
             match ui_update_rx.try_recv() {
                 Ok(new_state) => {
                     state = new_state;
                     led_on = false;
 
-                    // Immediately turn both LEDs off before starting
-                    // the new state.
+                    // Turn both LEDs off before applying the new state.
                     all_leds_off().await;
 
                     match state {
@@ -71,7 +70,7 @@ fn update_m7200_led_ui(
                         }
 
                         DisplayState::Paused => {
-                            info!("M7200 LEDs: paused");
+                            info!("M7200 LEDs: paused (both LEDs off)");
                         }
 
                         DisplayState::WarningDetected { .. } => {
@@ -89,13 +88,11 @@ fn update_m7200_led_ui(
                 }
             }
 
-            // Toggle the appropriate LED.
-            led_on = !led_on;
-
             match state {
-                DisplayState::Recording | DisplayState::Paused => {
-                    // Recording/paused:
-                    // Wi-Fi LED blinks, Internet LED stays off.
+                DisplayState::Recording => {
+                    // Recording: Wi-Fi LED blinks; Internet LED stays off.
+                    led_on = !led_on;
+
                     set_led(INTERNET_LED, 0).await;
 
                     if led_on {
@@ -105,9 +102,16 @@ fn update_m7200_led_ui(
                     }
                 }
 
+                DisplayState::Paused => {
+                    // Paused: both LEDs stay off.
+                    led_on = false;
+                    all_leds_off().await;
+                }
+
                 DisplayState::WarningDetected { .. } => {
-                    // Warning:
-                    // Wi-Fi LED stays off, Internet LED blinks.
+                    // Warning: Internet LED blinks; Wi-Fi LED stays off.
+                    led_on = !led_on;
+
                     set_led(WIFI_LED, 0).await;
 
                     if led_on {
@@ -129,10 +133,10 @@ pub fn update_ui(
     shutdown_token: CancellationToken,
     ui_update_rx: mpsc::Receiver<DisplayState>,
 ) {
-    // The M7200 has no screen. Its Wi-Fi and Internet LEDs are therefore
-    // used as the Rayhunter status display.
+    // The M7200 has no screen, so use its Wi-Fi and Internet LEDs
+    // to display Rayhunter status.
     //
-    // "Invisible" does not disable the physical M7200 LEDs.
+    // Invisible mode does not disable these physical LEDs.
     if is_m7200_led_device() {
         info!("detected TP-Link M7200 LED display");
 
@@ -141,8 +145,7 @@ pub fn update_ui(
         return;
     }
 
-    // Preserve the original TP-Link behaviour for devices that have
-    // the normal TP-Link display hardware.
+    // Preserve normal TP-Link display handling on other devices.
     let display_level = config.ui_level;
 
     if display_level == UiLevel::Invisible {
@@ -152,10 +155,20 @@ pub fn update_ui(
     if fs::exists(tplink_onebit::OLED_PATH).unwrap_or_default() {
         info!("detected one-bit display");
 
-        tplink_onebit::update_ui(task_tracker, config, shutdown_token, ui_update_rx);
+        tplink_onebit::update_ui(
+            task_tracker,
+            config,
+            shutdown_token,
+            ui_update_rx,
+        );
     } else {
         info!("fallback to framebuffer");
 
-        tplink_framebuffer::update_ui(task_tracker, config, shutdown_token, ui_update_rx);
+        tplink_framebuffer::update_ui(
+            task_tracker,
+            config,
+            shutdown_token,
+            ui_update_rx,
+        );
     }
 }

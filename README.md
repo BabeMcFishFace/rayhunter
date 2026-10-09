@@ -18,7 +18,7 @@ They are used as follows:
 | Rayhunter status | M7200 indicator |
 |---|---|
 | Recording | Wi-Fi LED blinks |
-| Paused | Wi-Fi LED blinks |
+| Paused | Both LEDs are off |
 | Warning detected | Internet LED blinks |
 | Stopped | Both LEDs are off |
 
