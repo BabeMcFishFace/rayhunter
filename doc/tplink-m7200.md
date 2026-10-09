@@ -15,8 +15,8 @@ slot, and no display.
 This branch adds support for using the M7200's indicator LEDs. On tested
 hardware, the Wi-Fi LED is exposed as `signal2_led` and the Internet LED as
 `signal3_led`.
-The M7200 LED implementation uses the Wi-Fi LED to indicate recording by blinking. 
-Both LEDs remain off when Rayhunter is paused or stopped. The Internet LED blinks 
+The M7200 LED implementation uses the Wi-Fi LED to indicate recording by blinking.
+Both LEDs remain off when Rayhunter is paused or stopped. The Internet LED blinks
 when Rayhunter detects a warning.
 
 ## Hardware versions
